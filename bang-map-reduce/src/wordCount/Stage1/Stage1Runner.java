@@ -1,0 +1,38 @@
+package wordCount.Stage1;
+
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FilterOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+
+public class Stage1Runner {
+public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+	Configuration conf=new Configuration();
+	Job job=Job.getInstance(conf,"Word Count Stage1");
+	job.setJarByClass(Stage1Runner.class);
+	job.setMapperClass(WordMapper.class);
+	job.setReducerClass(SumReducer.class);
+	
+	job.setOutputKeyClass(Text.class);
+	job.setOutputValueClass(IntWritable.class);
+	
+	job.setInputFormatClass(TextInputFormat.class);
+	job.setOutputFormatClass(SequenceFileOutputFormat.class);
+	
+	FileInputFormat.setInputPaths(job,new Path(args[0]));
+	FileOutputFormat.setOutputPath(job, new Path(args[1]));
+	
+	System.exit(job.waitForCompletion(true)?0:1);
+	
+	
+}
+}
